@@ -1,0 +1,89 @@
+version: "3.9"
+
+services:
+  # ── Database ─────────────────────────────────────────────
+  database:
+    image: postgres:16-alpine
+    container_name: semicon-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-semiconductor_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-semiconductor_pass_2024}
+      POSTGRES_DB: ${POSTGRES_DB:-semiconductor_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U semiconductor_user -d semiconductor_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - semicon-net
+
+  # ── Backend (FastAPI + ML + Preprocessing) ──────────────
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: semicon-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-semiconductor_user}:${POSTGRES_PASSWORD:-semiconductor_pass_2024}@database:5432/${POSTGRES_DB:-semiconductor_db}
+      MODEL_PATH: /app/ml_service/lightgbm_model.pkl
+      PYTHONPATH: /app
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - semicon-net
+
+  # ── Frontend (React + Nginx) ────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: semicon-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - semicon-net
+
+  # ── Monitoring ──────────────────────────────────────────
+  monitoring:
+    build:
+      context: .
+      dockerfile: monitoring/Dockerfile
+    container_name: semicon-monitoring
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    networks:
+      - semicon-net
+
+  # ── Quantum Service (Placeholder) ──────────────────────
+  quantum_service:
+    build:
+      context: .
+      dockerfile: quantum_service/Dockerfile
+    container_name: semicon-quantum
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    networks:
+      - semicon-net
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  semicon-net:
+    driver: bridge
