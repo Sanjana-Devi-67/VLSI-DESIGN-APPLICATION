@@ -1,0 +1,7 @@
+# Ignore database data
+data/
+*.db
+*.sqlite3
+pg_data/
+mysql_data/
+*.log

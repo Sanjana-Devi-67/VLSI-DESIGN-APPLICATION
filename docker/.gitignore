@@ -1,0 +1,4 @@
+# Ignore docker data and environments
+.env
+*.log
+data/

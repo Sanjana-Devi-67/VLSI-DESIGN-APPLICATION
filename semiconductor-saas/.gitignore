@@ -1,0 +1,33 @@
+# Node.js
+node_modules/
+dist/
+build/
+.next/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+.venv/
+.jupyter/
+*.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Databases
+*.db
+*.sqlite3
+
+# IDEs
+.idea/
+.vscode/
+
+# Build dirs
+secom_dataset/
