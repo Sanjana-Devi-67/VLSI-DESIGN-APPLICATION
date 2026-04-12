@@ -5,7 +5,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://semiconductor_user:semiconductor_pass_2024@localhost:5432/semiconductor_db"
+    "sqlite:///./semiconductor.db"
 )
 # Fix for Render
 if DATABASE_URL.startswith("postgres://"):

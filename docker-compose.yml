@@ -1,71 +1,44 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:15
-    container_name: qantyx_postgres
-    restart: always
-    environment:
-      POSTGRES_USER: qantyx_user
-      POSTGRES_PASSWORD: qantyx_password
-      POSTGRES_DB: qantyx_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
-
-  redis:
-    image: redis:alpine
-    container_name: qantyx_redis
-    ports:
-      - "6379:6379"
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: qantyx_backend
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
-      - redis
-    environment:
-      - DATABASE_URL=postgresql://qantyx_user:qantyx_password@db:5432/qantyx_db
-      - REDIS_URL=redis://redis:6379
-    volumes:
-      - ./backend:/app
-
-  ai-engine:
-    build:
-      context: ./ai-engine
-      dockerfile: Dockerfile
-    container_name: qantyx_ai_engine
-    ports:
-      - "8001:8001"
-    volumes:
-      - ./ai-engine:/app
-
-  vlsi-tools:
-    build:
-      context: ./vlsi-tools
-      dockerfile: Dockerfile
-    container_name: qantyx_vlsi_tools
-    ports:
-      - "8002:8002"
-    volumes:
-      - ./vlsi-tools:/app
-
+  # NextJS Frontend
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: qantyx_frontend
     ports:
       - "3000:3000"
     depends_on:
       - backend
 
-volumes:
-  postgres_data:
+  # Main API Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      # Maps local port 8001 to container's 8000, 
+      # since frontend code expects http://localhost:8001/
+      - "8001:8000"
+    depends_on:
+      - ai-engine
+      - vlsi-tools
+    environment:
+      - AI_ENGINE_URL=http://ai-engine:8001
+      - VLSI_TOOLS_URL=http://vlsi-tools:8002
+
+  # AI Engine Service
+  ai-engine:
+    build:
+      context: ./ai-engine
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8001" 
+
+  # VLSI Simulation Tools Service
+  vlsi-tools:
+    build:
+      context: ./vlsi-tools
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8002"

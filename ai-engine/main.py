@@ -1,26 +1,56 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-app = FastAPI(title="QANTYX AI Engine", description="AI Models for VLSI & Semiconductor Analytics")
+from llm.hybrid_llm import generate_verilog
+
+app = FastAPI(
+    title="QANTYX AI Engine"
+)
+
 
 class DesignRequest(BaseModel):
     prompt: str
 
-@app.post("/generate-verilog")
-async def generate_verilog(request: DesignRequest):
-    # Placeholder for LLM integration (Llama/Mistral)
-    return {"verilog_code": f"module generated_from_prompt;\n// {request.prompt}\nendmodule"}
 
-@app.post("/predict-power")
-async def predict_power(features: dict):
-    # Placeholder for LightGBM/PyTorch power prediction
-    return {"power_estimate": 1.5, "unit": "mW"}
+@app.get("/")
+def home():
 
-@app.post("/detect-defects")
-async def detect_defects(sensor_data: dict):
-    # Placeholder for Autoencoder/LightGBM defect prediction
-    return {"defect_probability": 0.05, "status": "normal"}
+    return {
+        "service": "AI Engine Running"
+    }
+
+
+@app.post("/generate")
+async def generate(request: DesignRequest):
+
+    result = generate_verilog(
+        request.prompt
+    )
+
+    return {
+        "verilog": result
+    }
+
 
 @app.get("/health")
-async def health_check():
-    return {"status": "ok", "service": "ai-engine"}
+def health():
+
+    return {
+        "status": "ok"
+    }
+
+@app.post("/fix")
+def fix(data: dict):
+
+    verilog = data["verilog"]
+
+    from llm.api_llm import fix_verilog
+
+    fixed = fix_verilog(
+        verilog,
+        "Fix synthesizable verilog"
+    )
+
+    return {
+        "optimized": fixed
+    }

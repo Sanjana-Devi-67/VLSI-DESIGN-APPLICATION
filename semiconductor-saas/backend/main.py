@@ -1,9 +1,9 @@
-"""
-Semiconductor Defect Detection SaaS — FastAPI Backend
-Main application entry point.
-"""
 import os
 import sys
+
+# Fix import paths
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import io
 import json
 import logging
@@ -16,10 +16,9 @@ from fastapi import FastAPI, UploadFile, File, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-
-from backend.database import get_db, init_db, engine
-from backend.models import SensorUpload, Prediction, Base
-from backend.schemas import (
+from database import get_db, init_db, engine
+from models import SensorUpload, Prediction, Base
+from schemas import (
     UploadResponse,
     PredictionRequest,
     ManualPredictionRequest,
@@ -49,7 +48,14 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     logger.info("✅ Database tables ready")
 
-    model_path = os.getenv("MODEL_PATH", "/app/ml_service/lightgbm_model.pkl")
+    model_path = os.getenv(
+    "MODEL_PATH",
+    os.path.join(
+        os.path.dirname(os.path.dirname(__file__)),
+        "ml_service",
+        "lightgbm_model.pkl"
+    )
+)
     try:
         predictor.load_model(model_path)
         logger.info("✅ LightGBM model loaded")
