@@ -1,0 +1,8 @@
+{
+  "extraPaths": [
+    "ai-engine",
+    "backend",
+    "vlsi-tools",
+    "semiconductor-saas/backend"
+  ]
+}

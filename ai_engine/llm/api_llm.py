@@ -15,22 +15,30 @@ def is_valid_verilog(code):
     if "endmodule" not in code:
         return False
 
-    # Must have at least logic
     if "always" not in code and "assign" not in code:
         return False
 
-    # Non synthesizable / invalid
+    # Check duplicate inputs
+    inputs = re.findall(r"input\s+\w+", code)
+
+    if len(inputs) != len(set(inputs)):
+        return False
+
+    # Check duplicate outputs
+    outputs = re.findall(r"output\s+\[?.*?\]?\s*\w+", code)
+
+    if len(outputs) != len(set(outputs)):
+        return False
+
+    # invalid constructs
     invalid_patterns = [
         "rule",
         "endrule",
         "Reg#",
         "Bit#",
         "mkReg",
-        "initial",
         "$display",
-        "$finish",
-        "fork",
-        "join"
+        "$finish"
     ]
 
     for word in invalid_patterns:
@@ -38,17 +46,22 @@ def is_valid_verilog(code):
             return False
 
     return True
-
-
+    
 def clean_verilog(text):
 
-    text = re.sub(r"```.*?```", "", text, flags=re.S)
+    # remove markdown
+    text = re.sub(r"```verilog", "", text, flags=re.I)
+    text = re.sub(r"```", "", text)
 
-    if "module" in text:
-        text = text[text.index("module"):]
+    # extract module to endmodule
+    match = re.search(
+        r"(module[\s\S]*?endmodule)",
+        text,
+        re.IGNORECASE
+    )
 
-    if "endmodule" in text:
-        text = text[: text.index("endmodule") + len("endmodule")]
+    if match:
+        return match.group(1).strip()
 
     return text.strip()
 
@@ -76,6 +89,9 @@ Return only corrected Verilog.
 
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
+        temperature=0.0,
+        top_p=1.0,
+        max_tokens=1024,
         messages=[
             {
                 "role": "system",
@@ -103,6 +119,12 @@ Rules:
 - Must compile
 - No simulation constructs
 - No explanation
+- No duplicate ports
+- Do not repeat clock or reset signals
+- Use only one reset signal
+- Use non-blocking assignments (<=) in sequential logic
+- Remove unused inputs
+- Clean RTL design
 
 Design:
 {prompt}
@@ -112,6 +134,9 @@ Return only Verilog.
 
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
+        temperature=0.0,
+        top_p=1.0,
+        max_tokens=1024,
         messages=[
             {
                 "role": "system",

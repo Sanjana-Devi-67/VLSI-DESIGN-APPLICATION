@@ -5,131 +5,143 @@ import { Button } from "@/components/ui/button";
 
 export default function OptimizationPage() {
 
-const [verilog,setVerilog] = useState("")
-const [optimized,setOptimized] = useState("")
+    const [verilog, setVerilog] = useState("")
+    const [optimized, setOptimized] = useState("")
 
 
-useEffect(() => {
+    useEffect(() => {
 
-const code = localStorage.getItem("verilog_code")
+        const code = localStorage.getItem("verilog_code")
 
-if (code) {
-setVerilog(code)
-}
+        if (code) {
+            setVerilog(code)
+        }
 
-}, [])
-
-
-
-const optimize = async()=>{
-
-const response = await fetch(
-"http://localhost:8001/optimize",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-verilog:verilog
-})
-}
-)
-
-const data = await response.json()
-
-setOptimized(data.optimized)
-
-}
+    }, [])
 
 
 
-const sendToSimulation = ()=>{
+    const optimize = async () => {
 
-if(!optimized){
-alert("Optimize code first")
-return
-}
+        try {
 
-localStorage.setItem("verilog_code",optimized)
+            const response = await fetch(
+                "http://localhost:8001/optimize/",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        verilog: verilog
+                    })
+                }
+            )
 
-setVerilog("")
-setOptimized("")
+            const data = await response.json()
 
-window.location.href="/dashboard/simulation"
+            setOptimized(data.optimized)
+            setVerilog(data.optimized)
 
-}
+            localStorage.setItem("verilog_code", data.optimized)
 
+        } catch (error) {
 
-return(
+            console.error("Optimize Error:", error)
 
-<div className="p-10">
+        }
 
-<h1 className="text-3xl mb-5">
-Optimization Page
-</h1>
-
-
-<div className="grid grid-cols-2 gap-5">
-
-
-<div>
-
-<h2 className="mb-2">
-Generated Code
-</h2>
-
-<textarea
-className="w-full h-96 bg-black text-green-400 p-4"
-value={verilog}
-onChange={(e)=>setVerilog(e.target.value)}
-/>
-
-</div>
+    }
 
 
-<div>
 
-<h2 className="mb-2">
-Optimized Code
-</h2>
+    const sendToSimulation = () => {
 
-<textarea
-className="w-full h-96 bg-black text-cyan-400 p-4"
-value={optimized}
-onChange={(e)=>setOptimized(e.target.value)}
-/>
+        if (!optimized) {
+            alert("Optimize code first")
+            return
+        }
 
-</div>
+        localStorage.setItem("verilog_code", optimized)
+
+        setVerilog("")
+        setOptimized("")
+
+        window.location.href = "/dashboard/simulation"
+
+    }
 
 
-</div>
+    return (
+
+        <div className="p-10">
+
+            <h1 className="text-3xl mb-5">
+                Optimization Page
+            </h1>
 
 
-<div className="mt-5 flex gap-3">
+            <div className="grid grid-cols-2 gap-5">
 
-<Button onClick={optimize}>
-Optimize
-</Button>
 
-<Button onClick={sendToSimulation}>
-Send To Simulation
-</Button>
+                <div>
 
-<Button
-variant="destructive"
-onClick={()=>{
-setVerilog("")
-setOptimized("")
-}}
->
-Clear
-</Button>
+                    <h2 className="mb-2">
+                        Generated Code
+                    </h2>
 
-</div>
+                    <textarea
+                        className="w-full h-96 bg-black text-green-400 p-4"
+                        value={verilog}
+                        onChange={(e) => setVerilog(e.target.value)}
+                    />
 
-</div>
+                </div>
 
-)
+
+                <div>
+
+                    <h2 className="mb-2">
+                        Optimized Code
+                    </h2>
+
+                    <textarea
+                        className="w-full h-96 bg-black text-cyan-400 p-4"
+                        value={optimized}
+                        onChange={(e) => setOptimized(e.target.value)}
+                    />
+
+                </div>
+
+
+            </div>
+
+
+            <div className="mt-5 flex gap-3">
+
+                <Button onClick={optimize}>
+                    Optimize
+                </Button>
+
+                <Button onClick={sendToSimulation}>
+                    Send To Simulation
+                </Button>
+
+                <Button
+                    variant="destructive"
+                    onClick={() => {
+                        setVerilog("")
+                        setOptimized("")
+                        localStorage.removeItem("verilog_code")
+                    }}
+                >
+                    Clear
+                </Button>
+
+            </div>
+
+        </div>
+
+    )
 
 }

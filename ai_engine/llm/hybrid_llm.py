@@ -6,12 +6,12 @@ def generate_verilog(prompt):
 
     try:
 
-        print("Using Local LLM")
+        print("Using Groq API")
 
-        return generate_local(prompt)
+        return generate_api(prompt)
 
     except Exception as e:
 
-        print("Local failed — using API")
+        print("API failed — using Local")
 
-        return generate_api(prompt)
+        return generate_local(prompt)

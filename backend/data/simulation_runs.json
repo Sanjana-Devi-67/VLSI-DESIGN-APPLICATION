@@ -1,74 +1,72 @@
 [
   {
-    "id": "9b38c3f4-99e5-4e51-9661-56f9d63a8510",
+    "id": "f1324c7b-e583-477b-a761-83fec2bbc34c",
     "name": "custom_design.v",
     "type": "Logic (Verilator)",
-    "status": "Failed",
-    "duration": "0.1s",
-    "date": "2026-04-12T13:14:49.120Z",
-    "verilog": "I can provide you with a general idea of how to design a 5-bit counter using Verilog. However, I will not be able to provide you with a complete design since it depends on your specific requirements and the available hardware resources. Here's a general idea of how you can design a 5-bit counter using Verilog:\n\n1. Define the counter logic:\n   a. Define the input signal \"count\" that represents the number of bits to count.\n   b. Define the output signal \"count_out\" that represents the number of bits counted.\n   c. Define the reset signal \"reset\" that is used to start the counter.\n\n2. Implement the counter logic:\n   a. Use the \"count\" input signal to generate the count value.\n   b. Use the \"count_out\" output signal to update the count value.\n   c. Use the \"reset\" input signal to start the counter.\n   d. Use the \"count\" output signal to stop the counter.\n\n3. Implement the reset logic:\n   a. Use the \"reset\" input signal to reset the counter.\n   b. Use the \"count\" output signal to update the reset value.\n\n4. Implement the clock and reset signals:\n   a. Use the \"clk\" input signal to clock the counter.\n   b. Use the \"reset\" input signal to reset the counter.\n\n5. Test the counter:\n   a. Use the \"count_out\" output signal to check if the counter has reached the desired number of bits.\n   b. Use the \"count\" output signal to",
+    "status": "Passed",
+    "duration": "0.0s",
+    "date": "2026-04-13T15:18:03.890Z",
+    "verilog": "module adder_4bit(\n    input clk,\n    input reset,\n    input  [3:0] a,\n    input  [3:0] b,\n    output [3:0] sum,\n    output       cout\n);\n\n    assign {cout, sum} = a + b;\n\nendmodule",
     "analysis": {
-      "status": "Failed",
+      "status": "Passed",
       "syntax": {
-        "errors": [
-          "Missing module declaration"
-        ],
+        "errors": [],
         "warnings": [],
-        "error_count": 1,
+        "error_count": 0,
         "warning_count": 0
       },
       "timing": {
-        "critical_path_ns": 1.57,
-        "max_frequency_mhz": 636.9,
-        "setup_margin_ns": 1.8,
-        "hold_margin_ns": 0.122,
-        "slack_ns": 8.43,
+        "critical_path_ns": 1.42,
+        "max_frequency_mhz": 704.2,
+        "setup_margin_ns": 1.88,
+        "hold_margin_ns": 0.138,
+        "slack_ns": 8.58,
         "slack_met": true,
         "target_period_ns": 10,
         "logic_levels": 1
       },
       "power": {
-        "dynamic_power_uw": 24,
+        "dynamic_power_uw": 30,
         "leakage_power_uw": 0,
-        "total_power_uw": 24,
-        "total_power_mw": 0.024,
+        "total_power_uw": 30,
+        "total_power_mw": 0.03,
         "toggle_rate": 0.25,
         "voltage_v": 1.1
       },
       "area": {
         "flip_flops": 0,
-        "combinational_gates": 12,
-        "total_gate_equivalents": 12,
-        "estimated_area_um2": 17.3,
+        "combinational_gates": 10,
+        "total_gate_equivalents": 10,
+        "estimated_area_um2": 14.4,
         "technology_node": "45nm"
       },
       "drc": {
-        "overall_status": "FAIL",
+        "overall_status": "PASS",
         "checks": [
           {
             "name": "Module Declaration",
-            "status": "FAIL",
-            "details": "No module declaration found"
+            "status": "PASS",
+            "details": "Module properly declared"
           },
           {
             "name": "Port Declarations",
             "status": "PASS",
-            "details": "6 inputs, 6 outputs declared"
+            "details": "4 inputs, 2 outputs declared"
           },
           {
             "name": "Clock Signal",
-            "status": "WARN",
-            "details": "No clock signal found \u2014 design may be combinational only"
+            "status": "PASS",
+            "details": "Clock signal detected"
           },
           {
             "name": "Reset Signal",
-            "status": "WARN",
-            "details": "No reset signal \u2014 sequential elements may not initialize properly"
+            "status": "PASS",
+            "details": "Reset signal detected"
           },
           {
             "name": "Module Closure",
-            "status": "FAIL",
-            "details": "Missing 'endmodule'"
+            "status": "PASS",
+            "details": "Module properly closed"
           },
           {
             "name": "Sensitivity Lists",
@@ -77,12 +75,261 @@
           }
         ],
         "total_checks": 6,
-        "passed": 2,
-        "warnings": 2,
-        "failures": 2
+        "passed": 6,
+        "warnings": 0,
+        "failures": 0
       }
     },
-    "created_at": "2026-04-12T18:44:49.129526"
+    "created_at": "2026-04-13T20:48:03.897120"
+  },
+  {
+    "id": "1dc12e8c-676a-4a76-88fe-eb0b3652bf4a",
+    "name": "custom_design.v",
+    "type": "Logic (Verilator)",
+    "status": "Passed",
+    "duration": "0.0s",
+    "date": "2026-04-13T15:15:18.156Z",
+    "verilog": "module adder4bit(\n    input clk,\n    input reset,\n    input  [3:0] a,\n    input  [3:0] b,\n    output [3:0] sum,\n    output       cout\n);\n\n    wire [3:0] carry;\n\n    assign carry[0] = a[0] & b[0];\n    assign sum[0] = a[0] ^ b[0];\n\n    assign carry[1] = (a[1] & b[1]) | (a[1] & carry[0]) | (b[1] & carry[0]);\n    assign sum[1] = a[1] ^ b[1] ^ carry[0];\n\n    assign carry[2] = (a[2] & b[2]) | (a[2] & carry[1]) | (b[2] & carry[1]);\n    assign sum[2] = a[2] ^ b[2] ^ carry[1];\n\n    assign carry[3] = (a[3] & b[3]) | (a[3] & carry[2]) | (b[3] & carry[2]);\n    assign sum[3] = a[3] ^ b[3] ^ carry[2];\n\n    assign cout = carry[3];\n\nendmodule",
+    "analysis": {
+      "status": "Passed",
+      "syntax": {
+        "errors": [],
+        "warnings": [],
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "timing": {
+        "critical_path_ns": 4.27,
+        "max_frequency_mhz": 234.2,
+        "setup_margin_ns": 0.36,
+        "hold_margin_ns": 0.134,
+        "slack_ns": 5.73,
+        "slack_met": true,
+        "target_period_ns": 10,
+        "logic_levels": 6
+      },
+      "power": {
+        "dynamic_power_uw": 30,
+        "leakage_power_uw": 0.04,
+        "total_power_uw": 30,
+        "total_power_mw": 0.03,
+        "toggle_rate": 0.25,
+        "voltage_v": 1.1
+      },
+      "area": {
+        "flip_flops": 0,
+        "combinational_gates": 36,
+        "total_gate_equivalents": 36,
+        "estimated_area_um2": 51.8,
+        "technology_node": "45nm"
+      },
+      "drc": {
+        "overall_status": "PASS",
+        "checks": [
+          {
+            "name": "Module Declaration",
+            "status": "PASS",
+            "details": "Module properly declared"
+          },
+          {
+            "name": "Port Declarations",
+            "status": "PASS",
+            "details": "4 inputs, 2 outputs declared"
+          },
+          {
+            "name": "Clock Signal",
+            "status": "PASS",
+            "details": "Clock signal detected"
+          },
+          {
+            "name": "Reset Signal",
+            "status": "PASS",
+            "details": "Reset signal detected"
+          },
+          {
+            "name": "Module Closure",
+            "status": "PASS",
+            "details": "Module properly closed"
+          },
+          {
+            "name": "Sensitivity Lists",
+            "status": "PASS",
+            "details": "No always blocks found"
+          }
+        ],
+        "total_checks": 6,
+        "passed": 6,
+        "warnings": 0,
+        "failures": 0
+      }
+    },
+    "created_at": "2026-04-13T20:45:18.158783"
+  },
+  {
+    "id": "a7b3333d-db8f-497a-b94a-aa81d7309f22",
+    "name": "custom_design.v",
+    "type": "Logic (Verilator)",
+    "status": "Passed",
+    "duration": "0.0s",
+    "date": "2026-04-13T13:59:41.772Z",
+    "verilog": "module counter(\n    input clk,\n    input reset,\n    input  wire clk,\n    input  wire rst,\n    output reg [3:0] count\n);\n\nalways @ (posedge clk or posedge rst) begin\n    if (rst) begin\n        count <= 4'd0;\n    end else begin\n        count <= count + 1;\n    end\nend\n\nendmodule",
+    "analysis": {
+      "status": "Passed",
+      "syntax": {
+        "errors": [],
+        "warnings": [],
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "timing": {
+        "critical_path_ns": 1.8,
+        "max_frequency_mhz": 555.6,
+        "setup_margin_ns": 1.68,
+        "hold_margin_ns": 0.138,
+        "slack_ns": 8.2,
+        "slack_met": true,
+        "target_period_ns": 10,
+        "logic_levels": 1
+      },
+      "power": {
+        "dynamic_power_uw": 33,
+        "leakage_power_uw": 0.36,
+        "total_power_uw": 33.4,
+        "total_power_mw": 0.0334,
+        "toggle_rate": 0.25,
+        "voltage_v": 1.1
+      },
+      "area": {
+        "flip_flops": 5,
+        "combinational_gates": 16,
+        "total_gate_equivalents": 46,
+        "estimated_area_um2": 66.2,
+        "technology_node": "45nm"
+      },
+      "drc": {
+        "overall_status": "PASS",
+        "checks": [
+          {
+            "name": "Module Declaration",
+            "status": "PASS",
+            "details": "Module properly declared"
+          },
+          {
+            "name": "Port Declarations",
+            "status": "PASS",
+            "details": "4 inputs, 1 outputs declared"
+          },
+          {
+            "name": "Clock Signal",
+            "status": "PASS",
+            "details": "Clock signal detected"
+          },
+          {
+            "name": "Reset Signal",
+            "status": "PASS",
+            "details": "Reset signal detected"
+          },
+          {
+            "name": "Module Closure",
+            "status": "PASS",
+            "details": "Module properly closed"
+          },
+          {
+            "name": "Sensitivity Lists",
+            "status": "PASS",
+            "details": "1/1 always blocks have sensitivity lists"
+          }
+        ],
+        "total_checks": 6,
+        "passed": 6,
+        "warnings": 0,
+        "failures": 0
+      }
+    },
+    "created_at": "2026-04-13T19:29:41.775679"
+  },
+  {
+    "id": "19ef4c1a-57ae-4f49-891d-f4944a7eb290",
+    "name": "custom_design.v",
+    "type": "Logic (Verilator)",
+    "status": "Passed",
+    "duration": "0.1s",
+    "date": "2026-04-13T13:36:54.015Z",
+    "verilog": "module counter(\n    input clk,\n    input reset,output reg [3:0] count);\n    reg [3:0] counter_reg;\n\n    // initialize the counter to 0\n    counter_reg <= 0;\n\n    // increment the counter by 1\n    always @(posedge clk) begin\n        counter_reg <= counter_reg + 1;\n    end\n\n    // generate the output reg [3:0] count @(posedge clk) begin\n        count <= counter_reg;\n    end\nendmodule",
+    "analysis": {
+      "status": "Passed",
+      "syntax": {
+        "errors": [],
+        "warnings": [],
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "timing": {
+        "critical_path_ns": 2.02,
+        "max_frequency_mhz": 495,
+        "setup_margin_ns": 1.56,
+        "hold_margin_ns": 0.133,
+        "slack_ns": 7.98,
+        "slack_met": true,
+        "target_period_ns": 10,
+        "logic_levels": 1
+      },
+      "power": {
+        "dynamic_power_uw": 61,
+        "leakage_power_uw": 0.52,
+        "total_power_uw": 61.5,
+        "total_power_mw": 0.0615,
+        "toggle_rate": 0.25,
+        "voltage_v": 1.1
+      },
+      "area": {
+        "flip_flops": 15,
+        "combinational_gates": 52,
+        "total_gate_equivalents": 142,
+        "estimated_area_um2": 204.5,
+        "technology_node": "45nm"
+      },
+      "drc": {
+        "overall_status": "PASS",
+        "checks": [
+          {
+            "name": "Module Declaration",
+            "status": "PASS",
+            "details": "Module properly declared"
+          },
+          {
+            "name": "Port Declarations",
+            "status": "PASS",
+            "details": "2 inputs, 2 outputs declared"
+          },
+          {
+            "name": "Clock Signal",
+            "status": "PASS",
+            "details": "Clock signal detected"
+          },
+          {
+            "name": "Reset Signal",
+            "status": "PASS",
+            "details": "Reset signal detected"
+          },
+          {
+            "name": "Module Closure",
+            "status": "PASS",
+            "details": "Module properly closed"
+          },
+          {
+            "name": "Sensitivity Lists",
+            "status": "PASS",
+            "details": "1/1 always blocks have sensitivity lists"
+          }
+        ],
+        "total_checks": 6,
+        "passed": 6,
+        "warnings": 0,
+        "failures": 0
+      }
+    },
+    "created_at": "2026-04-13T19:06:54.027877"
   },
   {
     "id": "5ee4ffae-173d-4b6c-9d4c-052f86456bb5",

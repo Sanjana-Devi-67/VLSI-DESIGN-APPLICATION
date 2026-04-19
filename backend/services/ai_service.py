@@ -6,7 +6,7 @@ AI_ENGINE_URL = "http://localhost:8000"
 
 async def generate_verilog(prompt):
 
-    async with httpx.AsyncClient(timeout=600.0) as client:
+    async with httpx.AsyncClient(timeout=60.0) as client:
 
         response = await client.post(
             f"{AI_ENGINE_URL}/generate",
