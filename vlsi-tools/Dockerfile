@@ -2,7 +2,7 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN pip install fastapi uvicorn pydantic
+RUN pip install fastapi uvicorn pydantic qiskit qiskit-aer numpy
 
 COPY . .
 

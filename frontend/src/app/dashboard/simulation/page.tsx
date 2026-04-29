@@ -75,7 +75,7 @@ function WaveformSVG({ signal, index }: { signal: any; index: number }) {
           className="block"
         >
           {/* Gridlines */}
-          {values.map((_, i) => (
+          {values.map((_: string, i: number) => (
             <line
               key={`grid-${i}`}
               x1={i * stepWidth}
@@ -105,7 +105,7 @@ function WaveformSVG({ signal, index }: { signal: any; index: number }) {
           />
 
           {/* Transition markers */}
-          {values.map((val, i) => {
+          {values.map((val: string, i: number) => {
             if (i > 0 && val !== values[i - 1]) {
               const x = i * stepWidth;
               return (
@@ -155,17 +155,19 @@ function TimeAxis({ count }: { count: number }) {
 function AnalysisPanel({ analysis }: { analysis: any }) {
   if (!analysis) return null;
 
-  const statusColor = {
+  const statusColorMap: Record<string, string> = {
     "Passed": "text-green-400 bg-green-500/10 border-green-500/30",
     "Warning": "text-yellow-400 bg-yellow-500/10 border-yellow-500/30",
     "Failed": "text-red-400 bg-red-500/10 border-red-500/30",
-  }[analysis.status] || "text-slate-400 bg-slate-500/10 border-slate-500/30";
+  };
+  const statusColor = statusColorMap[analysis.status as string] || "text-slate-400 bg-slate-500/10 border-slate-500/30";
 
-  const StatusIcon = {
+  const statusIconMap: Record<string, typeof CheckCircle2> = {
     "Passed": CheckCircle2,
     "Warning": AlertTriangle,
     "Failed": XCircle,
-  }[analysis.status] || AlertCircle;
+  };
+  const StatusIcon = statusIconMap[analysis.status as string] || AlertCircle;
 
   return (
     <div className="space-y-4">

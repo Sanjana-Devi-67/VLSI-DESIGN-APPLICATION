@@ -1,13 +1,10 @@
 import httpx
-from services.optimizer_service import optimize_verilog
+
 VLSI_SERVICE_URL = "http://localhost:8003"
 
 
 async def run_simulation(verilog_code):
-
-    optimized = await optimize_verilog(verilog_code)
-
-    verilog_code = optimized["optimized"]
+    """Send Verilog directly to VLSI tools for simulation (no re-optimization)."""
 
     async with httpx.AsyncClient(timeout=60.0) as client:
 
@@ -22,17 +19,11 @@ async def run_simulation(verilog_code):
 
 
 async def optimize_design(verilog):
+    """Call VLSI tools /optimize endpoint (quantum → logic → classical fallback)."""
 
-    print("Calling optimizer service")
+    print("Calling VLSI tools optimizer")
 
-    optimized = await optimize_verilog(verilog)
-
-    verilog = optimized["optimized"]
-
-    print("After optimization:")
-    print(verilog)
-
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
 
         response = await client.post(
             f"{VLSI_SERVICE_URL}/optimize",
@@ -41,4 +32,7 @@ async def optimize_design(verilog):
             }
         )
 
-    return response.json()
+    result = response.json()
+
+    # result contains: optimized, before, after, improvement, quantum_info, method
+    return result

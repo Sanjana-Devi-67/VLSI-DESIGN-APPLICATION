@@ -139,7 +139,7 @@ def check_verilog_syntax(verilog: str):
 
     # Check for blocking assignments in sequential always blocks
     if re.search(r'always\s*@\s*\(\s*posedge', verilog):
-        if re.search(r'[^<!=]=(?!=)', verilog.split('always')[1] if 'always' in verilog else ''):
+        if re.search(r'[^<=!]=(?!=)', verilog.split('always')[1] if 'always' in verilog else ''):
             warnings.append("Potential blocking assignment (=) in sequential always block — consider using non-blocking (<=)")
 
     # Check for missing input/output declarations
@@ -421,86 +421,161 @@ def simulate(data: dict):
     }
 
 
-@app.post("/optimize")
-def optimize(data: dict):
+# ===========================================================================
+# OPTIMIZATION ENDPOINT
+# ===========================================================================
+# Uses the new verilog_optimizer module for real logic optimization with
+# measurable before/after metrics.  Falls back to the classical optimizer
+# and quantum optimizer only if the new module fails.
+# ===========================================================================
 
-    verilog = data["verilog"]
+from quantum_optimizer import analyze_verilog
+from verilog_optimizer import optimize_verilog as run_logic_optimizer
 
-    # ------------------------------
+
+def classical_optimize(verilog: str) -> str:
+    """
+    Original classical (regex-based) Verilog optimizer.
+    Preserved as the last-resort fallback path.
+    """
+
     # 1. Convert rule → always block
-    # ------------------------------
     verilog = re.sub(
         r'rule\s+\w+\s*;',
         'always @(posedge clk) begin',
         verilog
     )
 
-    # ------------------------------
     # 2. Convert endrule → end
-    # ------------------------------
     verilog = verilog.replace("endrule", "end")
 
-    # ------------------------------
     # 3. Fix register initialization
-    # ------------------------------
     verilog = re.sub(
         r'(\w+)\s*=\s*(\d+);',
         r'\1 <= \2;',
         verilog
     )
 
-    # ------------------------------
     # 4. Add clk + reset if missing
-    # ------------------------------
     if "input clk" not in verilog:
-
         verilog = re.sub(
             r'module\s+(\w+)\s*\(',
             r'module \1(\n    input clk,\n    input reset,',
             verilog
         )
 
-    # ------------------------------
     # 5. Add reset logic if missing
-    # ------------------------------
     if "reset" not in verilog:
-
         verilog = verilog.replace(
             "always @(posedge clk)",
             "always @(posedge clk or posedge reset)"
         )
 
-    # ------------------------------
     # 6. Fix output width automatically
-    # ------------------------------
     match = re.search(r'reg\s*\[(\d+):0\]', verilog)
-
     if match:
         width = match.group(1)
-
         verilog = re.sub(
             r'output\s+reg\s+\w+',
             f'output reg [{width}:0] count',
             verilog
         )
 
-    # ------------------------------
     # 7. Ensure always block closed
-    # ------------------------------
     if "always" in verilog and "endmodule" in verilog:
-
         if "end" not in verilog.split("endmodule")[0]:
-
             verilog = verilog.replace(
                 "endmodule",
                 "end\nendmodule"
             )
 
-    # ------------------------------
     # 8. Clean extra whitespace
-    # ------------------------------
     verilog = re.sub(r'\n\s*\n', '\n\n', verilog)
 
+    return verilog
+
+
+@app.post("/optimize")
+def optimize(data: dict):
+
+    verilog = data["verilog"]
+
+    # -----------------------------------------------------------------------
+    # PRIMARY: QUANTUM OPTIMIZATION
+    # -----------------------------------------------------------------------
+    try:
+        from quantum_optimizer import quantum_optimize
+
+        print("[Optimize] Running QUANTUM optimizer (QAOA)...")
+
+        result = quantum_optimize(verilog)
+
+        optimized_code = result["optimized"]
+        quantum_info = result.get("quantum_info", {})
+
+        before_metrics = analyze_verilog(verilog)
+        after_metrics = analyze_verilog(optimized_code)
+
+        def pct(b, a):
+            return round(((b - a) / b) * 100, 1) if b > 0 else 0.0
+
+        print("[Optimize] Quantum optimization completed")
+
+        return {
+            "before": before_metrics,
+            "after": after_metrics,
+            "improvement": {
+                "gate_reduction": pct(before_metrics["gate_count"], after_metrics["gate_count"]),
+                "area_reduction": pct(before_metrics["estimated_area"], after_metrics["estimated_area"]),
+                "delay_reduction": pct(before_metrics["estimated_delay"], after_metrics["estimated_delay"]),
+            },
+            "optimized": optimized_code,
+            "optimizations_applied": len(quantum_info.get("applied_optimizations", [])),
+            "method": "quantum",
+            "quantum_info": quantum_info,
+        }
+
+    except Exception as e:
+        print(f"[Optimize] Quantum failed: {e}")
+        import traceback
+        traceback.print_exc()
+
+    # -----------------------------------------------------------------------
+    # FALLBACK 1: LOGIC OPTIMIZER
+    # -----------------------------------------------------------------------
+    try:
+        print("[Optimize] Falling back to logic optimizer...")
+
+        result = run_logic_optimizer(verilog)
+
+        result["method"] = "logic"
+
+        return result
+
+    except Exception as e:
+        print(f"[Optimize] Logic optimizer failed: {e}")
+
+    # -----------------------------------------------------------------------
+    # FALLBACK 2: CLASSICAL OPTIMIZER
+    # -----------------------------------------------------------------------
+    print("[Optimize] Falling back to classical optimizer...")
+
+    before_metrics = analyze_verilog(verilog)
+    optimized = classical_optimize(verilog)
+    after_metrics = analyze_verilog(optimized)
+
+    def pct(b, a):
+        return round(((b - a) / b) * 100, 1) if b > 0 else 0.0
+
     return {
-        "optimized": verilog
+        "before": before_metrics,
+        "after": after_metrics,
+        "improvement": {
+            "gate_reduction": pct(before_metrics["gate_count"], after_metrics["gate_count"]),
+            "area_reduction": pct(before_metrics["estimated_area"], after_metrics["estimated_area"]),
+            "delay_reduction": pct(before_metrics["estimated_delay"], after_metrics["estimated_delay"]),
+        },
+        "optimized": optimized,
+        "optimizations_applied": 1,
+        "method": "classical"
     }

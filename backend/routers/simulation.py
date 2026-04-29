@@ -8,13 +8,12 @@ router = APIRouter()
 @router.post("/simulate")
 async def simulate(data: dict):
 
-    waveform = await run_simulation(
+    result = await run_simulation(
         data["verilog"]
     )
 
     # Increment simulation counter
     increment_stat("total_simulations")
 
-    return {
-        "waveform": waveform
-    }
+    # Return the full simulation result (waveform, analysis, etc.)
+    return result

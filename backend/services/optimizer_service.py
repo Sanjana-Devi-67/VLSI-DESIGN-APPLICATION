@@ -38,3 +38,14 @@ async def optimize_verilog(verilog):
         return {"optimized": verilog}
 
     print("Duplicates found — fixing")
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                f"{AI_ENGINE_URL}/fix",
+                json={"verilog": verilog}
+            )
+            return response.json()
+    except Exception as e:
+        print(f"AI Engine fix failed: {e}")
+        return {"optimized": verilog}

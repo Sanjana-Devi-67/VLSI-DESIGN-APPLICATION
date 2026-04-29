@@ -36,3 +36,7 @@ docker-compose.override.yml
 # Project specific root files
 venv_all/
 zips.zip
+
+vlsi-tools/__test_generated.txt
+kill_ports.ps1
+backend/data/*.json
