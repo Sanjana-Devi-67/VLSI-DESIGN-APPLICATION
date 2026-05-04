@@ -102,8 +102,8 @@ Storage --> Dashboard
 | Service           | URL                        | Description |
 |------------------|---------------------------|------------|
 | Frontend         | http://localhost:3000     | User Interface |
-| AI Engine        | http://127.0.0.1:8001     | Verilog generation & fixing |
-| Backend API      | http://127.0.0.1:8000     | Simulation & analytics |
+| AI Engine        | http://127.0.0.1:8000     | Verilog generation & fixing |
+| Backend API      | http://127.0.0.1:8001     | Simulation & analytics |
 | VLSI Tools       | http://127.0.0.1:8003     | Verilog system |
 | Semiconductor saas | http://127.0.0.1:8002   | Semiconductor Defect detection |
 | AI Docs          | http://127.0.0.1:8001/docs| Swagger for AI engine |
