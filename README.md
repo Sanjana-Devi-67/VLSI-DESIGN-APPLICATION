@@ -113,7 +113,7 @@ Storage --> Dashboard
 
 ## 🔌 API Endpoints
 
-### **AI Engine (Port 8001)**
+### **AI Engine (Port 8000)**
 
 - **Fix Verilog**
   - **POST** `/fix`
@@ -131,7 +131,7 @@ Storage --> Dashboard
 
 ---
 
-### **Backend API (Port 8000)**
+### **Backend API (Port 8001)**
 
 - **Get Runs**
   - **GET** `/api/runs/`
