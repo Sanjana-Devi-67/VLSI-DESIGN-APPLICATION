@@ -1,4 +1,4 @@
-# 🚀 QANTYX – AI-Powered VLSI Design & Simulation Platform
+i# 🚀 QANTYX – AI-Powered VLSI Design & Simulation Platform
 
 QANTYX is an end-to-end AI-powered VLSI design platform that enables users to generate, optimize, and simulate Verilog designs using advanced language models and modern web technologies.
 
@@ -18,11 +18,6 @@ It combines **AI-based code generation**, **design correction**, **simulation wo
 - Improves synthesizability
 - Enhances code quality
 
-### ⚡ Simulation System
-- Run simulations on generated Verilog designs
-- Analyze performance metrics
-- Supports iterative testing
-
 ### 📊 Dashboard & Analytics
 - View simulation runs
 - Track system statistics
@@ -33,6 +28,19 @@ It combines **AI-based code generation**, **design correction**, **simulation wo
 - REST API-based communication
 - Real-time interaction
 
+## 🧠 Quantum Optimization Module
+
+Qantyx includes a dedicated quantum-inspired optimization module designed to enhance VLSI design efficiency.
+
+### Key Highlights:
+- Uses quantum-inspired algorithms (QAOA-style logic, annealing concepts)
+- Solves optimization problems like:
+  - Gate placement
+  - Routing optimization
+  - Parameter tuning
+- Hybrid approach:
+  - Classical ML + Quantum-inspired techniques
+- Scalable for future integration with real quantum hardware
 ---
 
 ## 🏗️ Architecture Overview
@@ -103,7 +111,7 @@ Storage --> Dashboard
 |------------------|---------------------------|------------|
 | Frontend         | http://localhost:3000     | User Interface |
 | AI Engine        | http://127.0.0.1:8000     | Verilog generation & fixing |
-| Backend API      | http://127.0.0.1:8001     | Simulation & analytics |
+| Backend API      | http://127.0.0.1:8001     | Simulation, analytics & Quantum Optimization|
 | VLSI Tools       | http://127.0.0.1:8003     | Verilog system |
 | Semiconductor saas | http://127.0.0.1:8002   | Semiconductor Defect detection |
 | AI Docs          | http://127.0.0.1:8001/docs| Swagger for AI engine |
@@ -181,8 +189,9 @@ npm run dev
 2.  Request sent to AI Engine via `/generate`\
 3.  Verilog code generated\
 4.  Optional fixing via `/fix`\
-5.  Backend runs simulation\
-6.  Results shown in dashboard
+5.  Quantum Optimization if required \
+6.  Backend runs simulation\
+7.  Results shown in dashboard
 
 ------------------------------------------------------------------------
 
@@ -191,6 +200,7 @@ npm run dev
 -   Generate digital circuits (ALU, counters)\
 -   Fix broken Verilog code\
 -   Run simulations\
+-   Optimize codes to reduce gates and power \
 -   Analyze design performance
 
 ------------------------------------------------------------------------
@@ -203,7 +213,7 @@ npm run dev
   Backend         FastAPI
   AI Engine       Python + LLM
   Communication   REST APIs
-
+  Optimization    Quantum Computing 
 ------------------------------------------------------------------------
 
 ## 🚧 Limitations
