@@ -1,4 +1,4 @@
-i# 🚀 QANTYX – AI-Powered VLSI Design & Simulation Platform
+# 🚀 QANTYX – AI-Powered VLSI Design & Simulation Platform
 
 QANTYX is an end-to-end AI-powered VLSI design platform that enables users to generate, optimize, and simulate Verilog designs using advanced language models and modern web technologies.
 
@@ -46,7 +46,8 @@ Qantyx includes a dedicated quantum-inspired optimization module designed to enh
 ## 🏗️ Architecture Overview
 
 - Frontend handles UI and user interaction
-- AI Engine generates and fixes Verilog code
+- AI Engine generates Verilog code
+- Quantum engine can be used for Optimization of the code
 - Backend manages simulation and analytics
 - All components communicate via APIs
 
@@ -59,6 +60,7 @@ subgraph Frontend ["Frontend (Next.js - Port 3000)"]
     UI[User Interface]
     DesignPage[Design Page]
     SimulationPage[Simulation Page]
+    OptimizationPage[Optimization Page]
     Dashboard[Dashboard]
 end
 
@@ -74,7 +76,16 @@ subgraph Backend ["Backend API (FastAPI - Port 8000)"]
     RunsAPI[/GET /api/runs/]
     StatsAPI[/GET /api/stats/]
     SimulationEngine[Simulation Engine]
+    QuantumAPI[/POST /api/optimize/]
     Storage[(Run Data / Results)]
+end
+
+%% ---------------- QUANTUM MODULE ----------------
+subgraph QuantumModule ["Quantum Optimization Engine (Qiskit)"]
+    QUBO[QUBO Builder]
+    QAOA[QAOA Ansatz]
+    Simulator[Aer Simulator]
+    Fallback[Classical Fallback]
 end
 
 %% ---------------- FLOW ----------------
@@ -82,7 +93,9 @@ end
 UI --> DesignPage
 UI --> SimulationPage
 UI --> Dashboard
+UI --> OptimizationPage
 
+%% AI Flow
 DesignPage -->|Prompt| GenerateAPI
 GenerateAPI --> LLM
 LLM -->|Verilog Code| DesignPage
@@ -91,8 +104,20 @@ DesignPage -->|Fix Request| FixAPI
 FixAPI --> LLM
 LLM -->|Optimized Code| DesignPage
 
-DesignPage -->|Send for Simulation| SimulationEngine
+%% Quantum Optimization Flow
+OptimizationPage -->|Send Verilog| QuantumAPI
+QuantumAPI --> QUBO
+QUBO --> QAOA
+QAOA --> Simulator
+Simulator --> QuantumAPI
 
+QAOA -->|If Qiskit unavailable| Fallback
+Fallback --> QuantumAPI
+
+QuantumAPI -->|Optimized Code + Metrics| OptimizationPage
+
+%% Simulation Flow
+DesignPage -->|Send for Simulation| SimulationEngine
 SimulationEngine --> Storage
 
 SimulationPage --> RunsAPI
@@ -111,8 +136,8 @@ Storage --> Dashboard
 |------------------|---------------------------|------------|
 | Frontend         | http://localhost:3000     | User Interface |
 | AI Engine        | http://127.0.0.1:8000     | Verilog generation & fixing |
-| Backend API      | http://127.0.0.1:8001     | Simulation, analytics & Quantum Optimization|
-| VLSI Tools       | http://127.0.0.1:8003     | Verilog system |
+| Backend API      | http://127.0.0.1:8001     | Simulation & analytics |
+| VLSI Tools       | http://127.0.0.1:8003     | Verilog system & Quantum Optimization|
 | Semiconductor saas | http://127.0.0.1:8002   | Semiconductor Defect detection |
 | AI Docs          | http://127.0.0.1:8001/docs| Swagger for AI engine |
 | Backend Docs     | http://127.0.0.1:8000/docs| Swagger for backend |
@@ -213,7 +238,7 @@ npm run dev
   Backend         FastAPI
   AI Engine       Python + LLM
   Communication   REST APIs
-  Optimization    Quantum Computing 
+  Optimization    Qiskit + QAOA Algos
 ------------------------------------------------------------------------
 
 ## 🚧 Limitations
