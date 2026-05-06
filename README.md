@@ -188,14 +188,14 @@ pip install -r requirements.txt
 
 ``` bash
 cd ai_engine
-python -m uvicorn main:app --port 8001 --reload
+python -m uvicorn main:app --port 8000 --reload
 ```
 
 ### Run Backend
 
 ``` bash
 cd backend
-python -m uvicorn main:app --port 8000 --reload
+python -m uvicorn main:app --port 8001 --reload
 ```
 
 ### Run Frontend
